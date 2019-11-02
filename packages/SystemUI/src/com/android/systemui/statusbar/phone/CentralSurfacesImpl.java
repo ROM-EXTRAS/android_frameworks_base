@@ -146,6 +146,7 @@ import com.android.systemui.flags.Flags;
 import com.android.systemui.fragments.ExtensionFragmentListener;
 import com.android.systemui.fragments.FragmentHostManager;
 import com.android.systemui.fragments.FragmentService;
+import com.android.systemui.keyguard.KeyguardSliceProvider;
 import com.android.systemui.keyguard.KeyguardUnlockAnimationController;
 import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.MigrateClocksToBlueprint;
@@ -283,6 +284,9 @@ import javax.inject.Provider;
  */
 @SysUISingleton
 public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+
+    private static final String PULSE_ON_NEW_TRACKS =
+            Settings.Secure.PULSE_ON_NEW_TRACKS;
 
     private static final int MSG_LAUNCH_TRANSITION_TIMEOUT = 1003;
     // 1020-1040 reserved for BaseStatusBar
@@ -893,6 +897,25 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
         mKeyguardIndicationController.init();
 
         mColorExtractor.addOnColorsChangedListener(mOnColorsChangedListener);
+
+
+        ContentObserver contentObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                if (uri.equals(Settings.Secure.getUriFor(Settings.Secure.PULSE_ON_NEW_TRACKS))) {
+                    boolean showPulseOnNewTracks = Settings.Secure.getInt(
+                            mContext.getContentResolver(),
+                            Settings.Secure.PULSE_ON_NEW_TRACKS, 0) == 1;
+                    KeyguardSliceProvider sliceProvider = KeyguardSliceProvider.getAttachedInstance();
+                    if (sliceProvider != null)
+                        sliceProvider.setPulseOnNewTracks(showPulseOnNewTracks);
+                }
+            }
+        };
+        mContext.getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.PULSE_ON_NEW_TRACKS), false,
+                contentObserver);
+        contentObserver.onChange(true);
 
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 
