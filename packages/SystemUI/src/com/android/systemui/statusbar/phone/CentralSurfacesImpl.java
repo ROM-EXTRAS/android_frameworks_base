@@ -152,6 +152,8 @@ import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.MigrateClocksToBlueprint;
 import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
+import com.android.systemui.navigation.pulse.PulseControllerImpl;
+import com.android.systemui.navigation.pulse.VisualizerView;
 import com.android.systemui.navigationbar.NavigationBarController;
 import com.android.systemui.navigationbar.views.NavigationBarView;
 import com.android.systemui.notetask.NoteTaskController;
@@ -441,6 +443,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
     private final NotificationsController mNotificationsController;
     private final StatusBarSignalPolicy mStatusBarSignalPolicy;
     private final StatusBarHideIconsForBouncerManager mStatusBarHideIconsForBouncerManager;
+
+    private final PulseControllerImpl mPulseController;
+    private VisualizerView mVisualizerView;
 
     /** Controller for the Shade. */
     private final ShadeSurface mShadeSurface;
@@ -828,6 +833,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
             mGlanceableHubContainerController = null;
         }
         mEmergencyGestureIntentFactory = emergencyGestureIntentFactory;
+
+        mPulseController = new PulseControllerImpl(mContext, this,
+                mCommandQueue, mUiBgExecutor, mConfigurationController, mColorExtractor);
 
         mLockscreenShadeTransitionController = lockscreenShadeTransitionController;
         mStartingSurfaceOptional = startingSurfaceOptional;
@@ -1239,6 +1247,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
         mCommandQueueCallbacks = mCommandQueueCallbacksLazy.get();
         mCommandQueue.addCallback(mCommandQueueCallbacks);
 
+        // this will initialize Pulse and begin listening for media events
+        mMediaManager.addCallback(mPulseController);
+
         // TODO: Deal with the ugliness that comes from having some of the status bar broken out
         // into fragments, but the rest here, it leaves some awkward lifecycle and whatnot.
         ShadeExpansionChangeEvent currentState =
@@ -1380,6 +1391,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                 }
             });
         }
+
+        mVisualizerView = (VisualizerView)
+                getNotificationShadeWindowView().findViewById(R.id.visualizerview);
 
         mReportRejectedTouch = getNotificationShadeWindowView()
                 .findViewById(R.id.report_rejected_touch);
@@ -2388,6 +2402,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
         // bar.
         mKeyguardStateController.notifyKeyguardGoingAway(true);
         mCommandQueue.appTransitionPending(mDisplayId, true /* forced */);
+        mPulseController.notifyKeyguardGoingAway();
         updateScrimController();
     }
 
@@ -2476,6 +2491,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                 || (mDozing && mDozeParameters.shouldControlScreenOff() && keyguardVisibleOrWillBe);
 
         mShadeSurface.setDozing(mDozing, animate);
+        mPulseController.setDozing(mDozing);
         Trace.endSection();
     }
 
@@ -3240,6 +3256,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                     updateDozingState();
                     checkBarModes();
                     updateScrimController();
+                    mPulseController.setKeyguardShowing(mState == StatusBarState.KEYGUARD);
                     Trace.endSection();
                 }
 
@@ -3281,6 +3298,10 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                     Trace.endSection();
                 }
             };
+
+    public VisualizerView getLsVisualizer() {
+        return mVisualizerView;
+    }
 
     private final BatteryController.BatteryStateChangeCallback mBatteryStateChangeCallback =
             new BatteryController.BatteryStateChangeCallback() {
