@@ -1492,6 +1492,16 @@ public class DisplayPolicy {
     public void applyPostLayoutPolicyLw(WindowState win, WindowManager.LayoutParams attrs,
             WindowState attached, WindowState imeTarget) {
         if (attrs.type == TYPE_NAVIGATION_BAR) {
+            // DF Notes: This has changed since commit dbe3411a55945a99e152b27ce59b6bf1022157c4
+            // Keeping it commented here for historical purpose.
+            // final int lastNavbarPosition = mNavigationBarPosition;
+            // mNavigationBarPosition = navigationBarPosition(displayFrames.mRotation);
+            // if (lastNavbarPosition == NAV_BAR_LEFT && mNavigationBarPosition != NAV_BAR_LEFT) {
+            //     notifyLeftInLandscapeChanged(false);
+            // } else if (lastNavbarPosition != NAV_BAR_LEFT && mNavigationBarPosition == NAV_BAR_LEFT) {
+            //     notifyLeftInLandscapeChanged(true);
+            // }
+
             // Keep mHasBottomNavigationBar updated to make sure the bar color control is working
             // correctly.
             mHasBottomNavigationBar = hasBottomNavigationBar();
@@ -2190,6 +2200,15 @@ public class DisplayPolicy {
 
     DecorInsets.Info getDecorInsetsInfo(int rotation, int w, int h) {
         return mDecorInsets.get(rotation, w, h);
+    }
+
+    private void notifyLeftInLandscapeChanged(boolean isOnLeft) {
+        mHandler.post(() -> {
+            StatusBarManagerInternal statusBar = getStatusBarManagerInternal();
+            if (statusBar != null) {
+                statusBar.leftInLandscapeChanged(isOnLeft);
+            }
+        });
     }
 
     /** Returns {@code true} to trust that {@link #mDecorInsets} already has the expected state. */
