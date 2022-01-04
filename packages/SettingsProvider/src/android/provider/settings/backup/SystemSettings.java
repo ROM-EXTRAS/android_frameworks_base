@@ -134,7 +134,8 @@ public class SystemSettings {
                 Settings.System.ADAPTIVE_PLAYBACK_ENABLED,
                 Settings.System.ADAPTIVE_PLAYBACK_TIMEOUT,
                 Settings.System.SENSOR_BLOCK,
-                Settings.System.SCREENSHOT_SHUTTER_SOUND
+                Settings.System.SCREENSHOT_SHUTTER_SOUND,
+                Settings.System.SCREEN_OFF_ANIMATION
         ));
         if (Flags.backUpSmoothDisplayAndForcePeakRefreshRate()) {
             settings.add(Settings.System.PEAK_REFRESH_RATE);
