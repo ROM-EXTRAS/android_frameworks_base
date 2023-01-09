@@ -51,7 +51,7 @@ import java.util.concurrent.Executor;
  */
 public class HearingDeviceLocalDataManager {
     private static final String TAG = "HearingDeviceDataMgr";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /** Interface for listening hearing device local data changed */
     public interface OnDeviceLocalDataChangeListener {
