@@ -30,6 +30,7 @@ import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.display.data.repository.DisplayRepository
 import com.android.systemui.display.data.repository.FocusedDisplayRepository
 import com.android.systemui.res.R
+import com.android.systemui.screenshot.ActionIntentCreator.createDelete
 import com.android.systemui.screenshot.ScreenshotEvent.SCREENSHOT_CAPTURE_FAILED
 import com.android.systemui.screenshot.ScreenshotEvent.SCREENSHOT_DISMISSED_OTHER
 import com.android.systemui.screenshot.TakeScreenshotService.RequestCallback
@@ -162,6 +163,7 @@ constructor(
         Log.d(TAG, "Screenshot request: $screenshotData")
         try {
             screenshotHandler.handleScreenshot(screenshotData, onSaved, callback)
+            // getNotificationController(screenshotData.displayId).showPostActionNotification(screenshotData)
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Error while ScreenshotController was handling ScreenshotData!", e)
             onFailedScreenshotRequest(screenshotData, callback)
