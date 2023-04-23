@@ -290,5 +290,9 @@ public class SecureSettings {
         Settings.Secure.ADVANCED_PROTECTION_MODE,
         Settings.Secure.ACCESSIBILITY_KEY_GESTURE_TARGETS,
         Settings.Secure.WINDOW_IGNORE_SECURE,
+        Settings.Secure.DOZE_TILT_GESTURE,
+        Settings.Secure.DOZE_HANDWAVE_GESTURE,
+        Settings.Secure.DOZE_POCKET_GESTURE,
+        Settings.Secure.DOZE_GESTURE_VIBRATE,
     };
 }
