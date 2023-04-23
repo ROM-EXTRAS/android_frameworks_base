@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:ellipsize="end"
-        android:fontFamily="google-sans-medium"
+        android:fontFamily="@*android:string/config_headlineFontFamily"
         android:maxWidth="280dp"
         android:textColor="?androidprv:attr/materialColorOnTertiaryFixed"
         android:textSize="14sp" />
