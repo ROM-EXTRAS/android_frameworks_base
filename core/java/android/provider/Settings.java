@@ -6544,6 +6544,12 @@ public final class Settings {
         @Readable
         public static final String SENSOR_BLOCKED_APP = "sensor_blocked_app";
 
+        /**
+         * Enable/Disable screenshot sound
+         * @hide
+         */
+        public static final String SCREENSHOT_SHUTTER_SOUND = "screenshot_shutter_sound";
+
         /***************************
         * Custom System Settings end
         ***************************/
