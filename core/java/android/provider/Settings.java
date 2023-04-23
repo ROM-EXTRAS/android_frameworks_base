@@ -6431,6 +6431,14 @@ public final class Settings {
          */
         public static final String CAMERA_FLASH_NOTIFICATION = "camera_flash_notification";
 
+        /*****************************
+        * Custom System Settings start
+        *****************************/
+
+        /***************************
+        * Custom System Settings end
+        ***************************/
+
         /**
          * Setting to enable screen flash notification feature.
          * <ul>
@@ -12608,6 +12616,14 @@ public final class Settings {
          */
         public static final String ADAPTIVE_CONNECTIVITY_ENABLED = "adaptive_connectivity_enabled";
 
+        /*****************************
+        * Custom Secure Settings start
+        *****************************/
+
+        /*****************************
+        * Custom Secure Settings end
+        *****************************/
+
         /**
          * Controls the 'Sunlight boost' toggle in wearable devices (high brightness mode).
          *
@@ -18294,6 +18310,15 @@ public final class Settings {
         public static final String[] TRANSIENT_SETTINGS = {
                 CLOCKWORK_HOME_READY,
         };
+
+
+        /*****************************
+        * Custom Global Settings start
+        *****************************/
+
+        /*****************************
+        * Custom Global Settings end
+        *****************************/
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
