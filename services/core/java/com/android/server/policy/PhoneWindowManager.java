@@ -698,6 +698,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private Action mAppSwitchPressAction;
     private Action mAppSwitchLongPressAction;
     private Action mEdgeLongSwipeAction;
+    private Action mThreeFingersSwipeAction;
 
     // support for activating the lock screen while the screen is on
     private HashSet<Integer> mAllowLockscreenWhenOnDisplays = new HashSet<>();
@@ -855,6 +856,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private boolean mLongSwipeDown;
     private CameraAvailbilityListener mCameraAvailabilityListener;
+
+    private ThreeFingersSwipeListener mThreeFingersSwipe;
+    private boolean mThreeFingersSwipeHasAction;
 
     private class PolicyHandler extends Handler {
 
@@ -1115,6 +1119,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(LineageSettings.System.getUriFor(
                     LineageSettings.System.VOLUME_UP_AND_DOWN_MUTE), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(LineageSettings.System.getUriFor(
+                    LineageSettings.System.KEY_THREE_FINGERS_SWIPE_ACTION), false, this,
                     UserHandle.USER_ALL);
             updateSettings();
         }
@@ -3310,6 +3317,26 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mEdgeLongSwipeAction = Action.fromSettings(resolver,
                 LineageSettings.System.KEY_EDGE_LONG_SWIPE_ACTION,
                 mEdgeLongSwipeAction);
+
+        Action threeFingersSwipeAction = Action.fromSettings(resolver,
+                LineageSettings.System.KEY_THREE_FINGERS_SWIPE_ACTION,
+                Action.NOTHING);
+
+        if (mThreeFingersSwipe != null && mThreeFingersSwipeAction != threeFingersSwipeAction) {
+            mThreeFingersSwipeAction = threeFingersSwipeAction;
+            if (mThreeFingersSwipeAction != Action.NOTHING && !mThreeFingersSwipeHasAction) {
+                mThreeFingersSwipeHasAction = true;
+                mWindowManagerFuncs.registerPointerEventListener(mThreeFingersSwipe, DEFAULT_DISPLAY);
+            } else if (mThreeFingersSwipeAction == Action.NOTHING && mThreeFingersSwipeHasAction) {
+                mWindowManagerFuncs.unregisterPointerEventListener(mThreeFingersSwipe, DEFAULT_DISPLAY);
+                mThreeFingersSwipeHasAction = false;
+            }
+            try {
+                mActivityManagerService.setThreeFingersSwipeActive(mThreeFingersSwipeHasAction);
+            } catch (Exception e) {
+                Log.e(TAG, "updateKeyAssignments() Exception: " + e);
+            }
+        }
 
         mShortPressOnWindowBehavior = SHORT_PRESS_WINDOW_NOTHING;
         if (mPackageManager.hasSystemFeature(FEATURE_PICTURE_IN_PICTURE)) {
@@ -7385,6 +7412,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (mVrManagerInternal != null) {
             mVrManagerInternal.addPersistentVrModeStateListener(mPersistentVrModeListener);
         }
+
+        mThreeFingersSwipe = new ThreeFingersSwipeListener(mContext, new ThreeFingersSwipeListener.Callbacks() {
+            @Override
+            public void onSwipeThreeFingers() {
+                if (mThreeFingersSwipeAction == Action.NOTHING)
+                    return;
+                long now = SystemClock.uptimeMillis();
+                KeyEvent event = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
+                        KeyEvent.KEYCODE_SYSRQ, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                        KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_TOUCHSCREEN);
+                performKeyAction(mThreeFingersSwipeAction, event);
+                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, "Three Fingers Swipe");
+            }
+        });
 
         readCameraLensCoverState();
         updateUiMode();
