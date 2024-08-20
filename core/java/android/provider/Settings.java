@@ -6406,6 +6406,14 @@ public final class Settings {
         @Readable
         public static final String SENSOR_BLOCKED_APP = "sensor_blocked_app";
 
+        /**
+         * Whether three fingers swipe is active
+         * 0 = Inactive, 1 = Active
+         * @hide
+         */
+        @Readable
+        public static final String THREE_FINGER_GESTURE_ACTIVE = "three_fingers_swipe_active";
+
         /***************************
         * Custom System Settings end
         ***************************/
