@@ -166,8 +166,8 @@ public class AconfigFlags {
                             + " Aconfig flag value for " + flagPackageAndName + " = " + value);
                     final Integer currentPriority = flagPriority.get(flagPackageAndName);
                     if (currentPriority != null && currentPriority >= priority) {
-                        Slog.i(LOG_TAG, "Skipping " + prefix + " flag " + flagPackageAndName
-                                + " because of the existing one with priority " + currentPriority);
+                        // Slog.i(LOG_TAG, "Skipping " + prefix + " flag " + flagPackageAndName
+                        //         + " because of the existing one with priority " + currentPriority);
                         continue;
                     }
                     flagPriority.put(flagPackageAndName, priority);
@@ -175,7 +175,7 @@ public class AconfigFlags {
                 }
             }
         } catch (IOException | XmlPullParserException e) {
-            Slog.w(LOG_TAG, "Failed to read Aconfig values from settings_config.xml", e);
+            // Slog.w(LOG_TAG, "Failed to read Aconfig values from settings_config.xml", e);
         }
     }
 
@@ -192,8 +192,8 @@ public class AconfigFlags {
         for (parsed_flag flag : parsedFlags.parsedFlag) {
             String flagPackageAndName = flag.package_ + "." + flag.name;
             boolean flagValue = (flag.state == Aconfig.ENABLED);
-            Slog.v(LOG_TAG, "Read Aconfig default flag value "
-                    + flagPackageAndName + " = " + flagValue);
+            // Slog.v(LOG_TAG, "Read Aconfig default flag value "
+            //         + flagPackageAndName + " = " + flagValue);
             mFlagValues.put(flagPackageAndName, flagValue);
 
             Permission permission = flag.permission == Aconfig.READ_ONLY
@@ -212,7 +212,7 @@ public class AconfigFlags {
     @Nullable
     public Boolean getFlagValue(@NonNull String flagPackageAndName) {
         Boolean value = mFlagValues.get(flagPackageAndName);
-        Slog.d(LOG_TAG, "Aconfig flag value for " + flagPackageAndName + " = " + value);
+        // Slog.d(LOG_TAG, "Aconfig flag value for " + flagPackageAndName + " = " + value);
         return value;
     }
 
@@ -248,14 +248,14 @@ public class AconfigFlags {
         }
         final Boolean flagValue = getFlagValue(featureFlag);
         if (flagValue == null) {
-            Slog.w(LOG_TAG, "Skipping element " + parser.getName()
-                    + " due to unknown feature flag " + featureFlag);
+            // Slog.w(LOG_TAG, "Skipping element " + parser.getName()
+            //         + " due to unknown feature flag " + featureFlag);
             return true;
         }
         // Skip if flag==false && attr=="flag" OR flag==true && attr=="!flag" (negated)
         if (flagValue == negated) {
-            Slog.v(LOG_TAG, "Skipping element " + parser.getName()
-                    + " behind feature flag " + featureFlag + " = " + flagValue);
+            // Slog.v(LOG_TAG, "Skipping element " + parser.getName()
+            //         + " behind feature flag " + featureFlag + " = " + flagValue);
             return true;
         }
         return false;
