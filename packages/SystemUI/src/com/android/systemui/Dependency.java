@@ -50,9 +50,11 @@ import com.android.systemui.statusbar.notification.stack.AmbientState;
 import com.android.systemui.statusbar.notification.stack.NotificationSectionsManager;
 import com.android.systemui.statusbar.phone.LightBarController;
 import com.android.systemui.statusbar.phone.ScreenOffAnimationController;
+import com.android.systemui.statusbar.phone.ScrimController;
 import com.android.systemui.statusbar.phone.SystemUIDialogManager;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
+import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.statusbar.window.StatusBarWindowControllerStore;
 import com.android.systemui.tuner.TunerService;
 
@@ -151,6 +153,8 @@ public class Dependency {
     @Inject Lazy<UserTracker> mUserTrackerLazy;
     @Inject Lazy<StatusBarWindowControllerStore> mStatusBarWindowControllerStoreLazy;
     @Inject Lazy<ActivityStarter> mActivityStarter;
+    @Inject Lazy<ScrimController> mScrimController;
+    @Inject Lazy<KeyguardStateController> mKeyguardStateController;
 
     @Inject
     public Dependency() {
@@ -197,7 +201,8 @@ public class Dependency {
         mProviders.put(
                 StatusBarWindowControllerStore.class, mStatusBarWindowControllerStoreLazy::get);
         mProviders.put(ActivityStarter.class, mActivityStarter::get);
-
+        mProviders.put(ScrimController.class, mScrimController::get);
+        mProviders.put(KeyguardStateController.class, mKeyguardStateController::get);
         Dependency.setInstance(this);
     }
 
