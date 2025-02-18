@@ -37,6 +37,7 @@ import static com.android.systemui.statusbar.StatusBarState.SHADE;
 
 import android.animation.TimeInterpolator;
 import android.annotation.Nullable;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
@@ -243,6 +244,7 @@ import com.android.systemui.statusbar.window.StatusBarWindowControllerStore;
 import com.android.systemui.statusbar.window.StatusBarWindowStateController;
 import com.android.systemui.surfaceeffects.ripple.RippleShader.RippleShape;
 import com.android.systemui.util.DumpUtilsKt;
+import com.android.systemui.util.MediaArtUtils;
 import com.android.systemui.util.WallpaperController;
 import com.android.systemui.util.concurrency.DelayableExecutor;
 import com.android.systemui.util.concurrency.MessageRouter;
@@ -397,6 +399,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
     DozeServiceHost mDozeServiceHost;
     private final LightRevealScrim mLightRevealScrim;
     private PowerButtonReveal mPowerButtonReveal;
+    private final MediaArtUtils mMediaArtUtils;
 
     /**
      * Whether we should delay the wakeup animation (which shows the notifications and moves the
@@ -884,6 +887,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
         if (PredictiveBackSysUiFlag.isEnabled()) {
             mContext.getApplicationInfo().setEnableOnBackInvokedCallback(true);
         }
+        mMediaArtUtils = MediaArtUtils.Companion.getInstance(mContext);
     }
 
     private void initBubbles(Bubbles bubbles) {
@@ -1150,6 +1154,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                 (requestTopUi, componentTag) -> mMainExecutor.execute(() ->
                         mNotificationShadeWindowController.setRequestTopUi(
                                 requestTopUi, componentTag))));
+		getNotifContainerParentView().addView(mMediaArtUtils.getMediaArtScrim(), 0);
+    }
+
+    private ViewGroup getNotifContainerParentView() {
+        ViewGroup rootView = (ViewGroup) getNotificationShadeWindowView().findViewById(R.id.scrim_behind).getParent();
+        ViewGroup targetView = rootView.findViewById(R.id.notification_container_parent);
+        return targetView;
     }
 
     @VisibleForTesting
@@ -1398,8 +1409,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
             });
         }
 
-        mVisualizerView = (VisualizerView)
-                getNotificationShadeWindowView().findViewById(R.id.visualizerview);
+        mVisualizerView = (VisualizerView) getNotifContainerParentView().findViewById(R.id.visualizerview);
 
         mReportRejectedTouch = getNotificationShadeWindowView()
                 .findViewById(R.id.report_rejected_touch);

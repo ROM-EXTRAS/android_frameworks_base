@@ -59,6 +59,16 @@
             layout="@layout/keyguard_status_view"
             android:visibility="gone"/>
 
+        <com.android.systemui.navigation.pulse.VisualizerView
+            android:id="@+id/visualizerview"
+            android:gravity="bottom"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            systemui:ignoreRightInset="true"
+        />
+
         <include layout="@layout/dock_info_overlay"/>
 
         <FrameLayout
