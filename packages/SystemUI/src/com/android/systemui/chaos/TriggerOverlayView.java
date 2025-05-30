@@ -23,7 +23,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 
 import static android.view.WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY;
 
