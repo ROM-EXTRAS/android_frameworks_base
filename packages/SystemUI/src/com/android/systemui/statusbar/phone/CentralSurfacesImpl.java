@@ -252,6 +252,8 @@ import dalvik.annotation.optimization.NeverCompile;
 
 import dagger.Lazy;
 
+import lineageos.providers.LineageSettings;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
