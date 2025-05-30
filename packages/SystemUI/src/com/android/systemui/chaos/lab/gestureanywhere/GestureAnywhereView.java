@@ -48,7 +48,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 import com.android.systemui.chaos.TriggerOverlayView;
 import  com.android.systemui.statusbar.phone.CentralSurfacesImpl;
 
