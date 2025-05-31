@@ -981,16 +981,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub implements D
                 StatusBarManagerService.this.remTile(tile);
             }
         }
-
-        @Override
-        public void leftInLandscapeChanged(boolean isLeft) {
-            if (mBar != null) {
-                try {
-                    mBar.leftInLandscapeChanged(isLeft);
-                } catch (RemoteException ex) {
-                }
-            }
-        }
     };
 
     private final GlobalActionsProvider mGlobalActionsProvider = new GlobalActionsProvider() {
