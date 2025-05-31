@@ -121,7 +121,7 @@ public class SystemSettings {
                 Settings.System.NOTIFICATION_COOLDOWN_ALL,
                 Settings.System.NOTIFICATION_COOLDOWN_VIBRATE_UNLOCKED,
                 Settings.System.PREFERRED_REGION,
-                Settings.System.THREE_FINGER_GESTURE_ACTIVE
+                Settings.System.THREE_FINGER_GESTURE_ACTIVE,
                 Settings.System.EDGE_LIGHT_ENABLED,
                 Settings.System.EDGE_LIGHT_ALWAYS_TRIGGER_ON_PULSE,
                 Settings.System.EDGE_LIGHT_REPEAT_ANIMATION,
