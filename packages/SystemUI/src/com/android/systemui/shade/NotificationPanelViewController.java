@@ -235,6 +235,7 @@ import com.android.systemui.statusbar.policy.KeyguardUserSwitcherView;
 import com.android.systemui.statusbar.policy.SplitShadeStateController;
 import com.android.systemui.unfold.SysUIUnfoldComponent;
 import com.android.systemui.util.Compile;
+import com.android.systemui.util.ScrimUtils;
 import com.android.systemui.util.SystemUIBoostFramework;
 import com.android.systemui.util.Utils;
 import com.android.systemui.util.time.SystemClock;
@@ -1005,6 +1006,7 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
                 });
         mAlternateBouncerInteractor = alternateBouncerInteractor;
         dumpManager.registerDumpable(this);
+        ScrimUtils.getInstance(context).setNotificationPanelViewController(this);
     }
 
     private void unlockAnimationFinished() {
@@ -2537,7 +2539,7 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
         }
     }
 
-    boolean isKeyguardShowing() {
+    public boolean isKeyguardShowing() {
         return mBarState == KEYGUARD;
     }
 
@@ -5418,12 +5420,12 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
             return super.performAccessibilityAction(host, action, args);
         }
     }
-    
+
     public boolean isPanelFullyCollapsed() {
         int state = mBarState;
-        if (state == StatusBarState.SHADE_LOCKED 
+        if (state == StatusBarState.SHADE_LOCKED
             || state == StatusBarState.KEYGUARD) {
-            return mQsController.isVisible();
+            return !mQsController.isVisible();
         }
         return mExpandedFraction <= 0.0f;
     }
