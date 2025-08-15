@@ -16,7 +16,7 @@ data class WeatherData(
     val touchAction: WeatherTouchAction? = null,
 ) {
     companion object {
-        const val DEBUG = false
+        const val DEBUG = true
         private const val TAG = "WeatherData"
         @VisibleForTesting const val DESCRIPTION_KEY = "description"
         @VisibleForTesting const val STATE_KEY = "state"
