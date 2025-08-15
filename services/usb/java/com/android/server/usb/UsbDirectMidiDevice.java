@@ -59,7 +59,7 @@ import java.util.ArrayList;
  */
 public final class UsbDirectMidiDevice implements Closeable {
     private static final String TAG = "UsbDirectMidiDevice";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private Context mContext;
     private String mName;

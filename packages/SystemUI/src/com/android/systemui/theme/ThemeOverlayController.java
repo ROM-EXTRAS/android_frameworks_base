@@ -123,7 +123,7 @@ import javax.inject.Inject;
 @SysUISingleton
 public class ThemeOverlayController implements CoreStartable, Dumpable {
     protected static final String TAG = "ThemeOverlayController";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private final ThemeOverlayApplier mThemeManager;
     private final UserManager mUserManager;

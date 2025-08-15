@@ -79,7 +79,7 @@ import java.util.function.Function;
  */
 public final class AuthSession implements IBinder.DeathRecipient {
     private static final String TAG = "BiometricService/AuthSession";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     /*
      * Defined in biometrics.proto
