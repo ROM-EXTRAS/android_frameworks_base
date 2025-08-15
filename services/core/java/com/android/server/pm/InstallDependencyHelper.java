@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class InstallDependencyHelper {
     private static final String TAG = InstallDependencyHelper.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String ROLE_SYSTEM_DEPENDENCY_INSTALLER =
             "android.app.role.SYSTEM_DEPENDENCY_INSTALLER";
     // The maximum amount of time to wait before the system unbinds from the verifier.

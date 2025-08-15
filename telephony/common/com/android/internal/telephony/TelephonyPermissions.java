@@ -47,7 +47,7 @@ import java.util.Set;
 public final class TelephonyPermissions {
     private static final String LOG_TAG = "TelephonyPermissions";
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     /** Feature flags */
     private static final FeatureFlags sFeatureFlag = new FeatureFlagsImpl();
     /**
