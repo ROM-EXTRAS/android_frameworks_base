@@ -31,10 +31,15 @@ import android.os.Handler
 import android.os.Looper
 import android.os.UserHandle
 import android.provider.Settings
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.renderscript.Allocation
+import android.renderscript.Element
+import android.renderscript.RenderScript
+import android.renderscript.ScriptIntrinsicBlur
 
 import androidx.core.content.getSystemService
 
@@ -60,9 +65,9 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
     private val _keyguard = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val _mediaEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val _qsExpanded = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    
+
     private var currentMediaScrimState = MediaScrimState.STATE_SCRIM_HIDDEN
-    
+
     private var listening = false
     private var featureEnabled = false
 
@@ -87,7 +92,7 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
 
     init {
         MSMHProxy.INSTANCE(context).addMediaMetadataListener(this)
-        
+
         context.contentResolver.registerContentObserver(
             Settings.System.getUriFor(LS_MEDIA_ART_ENABLED),
             false,
@@ -183,7 +188,7 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
                 .start()
         }
     }
-    
+
     private fun updateMediaArt() {
         mediaArtJob?.cancel()
         mediaArtJob = coroutineScope.launch {
@@ -216,7 +221,9 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
         )
 
         return LayerDrawable(arrayOf(
-            BitmapDrawable(context.resources, processedBitmap),
+            BitmapDrawable(context.resources, processedBitmap).apply {
+                gravity = Gravity.FILL
+            },
             ColorDrawable(fadeColor)
         ))
     }
@@ -256,30 +263,64 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
         }
     }
 
-    private fun getResizedBitmap(source: Bitmap): Bitmap {
+    private fun getResizedBitmap(source: Bitmap, blurRadius: Float = 25f): Bitmap {
         val metrics = context.getSystemService<WindowManager>()!!.currentWindowMetrics
         val bounds = metrics.bounds
+
+        // Downscale by 1/4th for a stronger blur effect and better performance
+        val targetWidth = maxOf(1, (bounds.width() / 4f).roundToInt())
+        val targetHeight = maxOf(1, (bounds.height() / 4f).roundToInt())
+
         val scaleFactor = maxOf(
-            bounds.width().toFloat() / source.width,
-            bounds.height().toFloat() / source.height
+            targetWidth.toFloat() / source.width,
+            targetHeight.toFloat() / source.height
         )
-        
+
         val scaledBitmap = Bitmap.createScaledBitmap(
             source,
-            (source.width * scaleFactor).roundToInt(),
-            (source.height * scaleFactor).roundToInt(),
+            maxOf(1, (source.width * scaleFactor).roundToInt()),
+            maxOf(1, (source.height * scaleFactor).roundToInt()),
             true
         )
 
-        return Bitmap.createBitmap(
+        val croppedBitmap = Bitmap.createBitmap(
             scaledBitmap,
-            maxOf((scaledBitmap.width - bounds.width()) / 2, 0),
-            maxOf((scaledBitmap.height - bounds.height()) / 2, 0),
-            min(bounds.width(), scaledBitmap.width),
-            min(bounds.height(), scaledBitmap.height)
+            maxOf((scaledBitmap.width - targetWidth) / 2, 0),
+            maxOf((scaledBitmap.height - targetHeight) / 2, 0),
+            min(targetWidth, scaledBitmap.width),
+            min(targetHeight, scaledBitmap.height)
         )
+
+        return blurBitmap(croppedBitmap, blurRadius)
     }
-    
+
+    private fun blurBitmap(image: Bitmap, radius: Float): Bitmap {
+        val inputBitmap = if (image.config == Bitmap.Config.ARGB_8888) {
+            image
+        } else {
+            image.copy(Bitmap.Config.ARGB_8888, true)
+        }
+
+        val outputBitmap = Bitmap.createBitmap(inputBitmap.width, inputBitmap.height, Bitmap.Config.ARGB_8888)
+
+        val renderScript = RenderScript.create(context)
+        val blurInput = Allocation.createFromBitmap(renderScript, inputBitmap)
+        val blurOutput = Allocation.createFromBitmap(renderScript, outputBitmap)
+        val blur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
+
+        blur.setInput(blurInput)
+        blur.setRadius(radius.coerceIn(0.1f, 25f)) // radius must be 0 < r <= 25
+        blur.forEach(blurOutput)
+        blurOutput.copyTo(outputBitmap)
+
+        blurInput.destroy()
+        blurOutput.destroy()
+        blur.destroy()
+        renderScript.destroy()
+
+        return outputBitmap
+    }
+
     override fun onAlbumArtChanged() {
         coroutineScope.launch {
             _mediaEvents.tryEmit(Unit)
@@ -309,7 +350,7 @@ class MediaArtUtils private constructor(context: Context) : MediaSessionManagerH
 
     companion object {
         private const val LS_MEDIA_ART_ENABLED = "ls_media_art_enabled"
-        
+
         @Volatile private var instance: MediaArtUtils? = null
 
         fun getInstance(context: Context): MediaArtUtils =
